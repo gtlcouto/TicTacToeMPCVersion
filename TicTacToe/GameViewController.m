@@ -23,6 +23,7 @@
 @property (weak, nonatomic) IBOutlet UILabel *timerLabel;
 @property (weak, nonatomic) IBOutlet UILabel *labelRow3Column3;
 @property NSSet *allGameLabels;
+@property (weak, nonatomic) IBOutlet UITextField *dumb;
 
 @property (weak, nonatomic) IBOutlet UILabel *playerTurnLabel;
 @property (strong, nonatomic) IBOutlet UILabel *winLabel;
@@ -60,6 +61,9 @@
 
     //MPC CODE BELOW
     _appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+
+
+    _dumb.delegate = self;
 
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(didReceiveDataWithNotification:)
@@ -326,12 +330,22 @@
     NSString *receivedText = [[NSString alloc] initWithData:receivedData encoding:NSUTF8StringEncoding];
 
     UILabel *label = (UILabel *)[self.view viewWithTag:[receivedText intValue]];
-    if (self.isPlayerXTurn) {
 
-        label.text = @"x";
-    } else {
-        label.text = @"o";
-    }
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (self.isPlayerXTurn) {
+
+            label.text = @"x";
+        } else {
+            label.text = @"o";
+        }
+    });
+
+    //[label performSelectorOnMainThread:@selector(setText:) withObject:receivedText waitUntilDone:NO];
+
+
+
+
 }
 
 @end
