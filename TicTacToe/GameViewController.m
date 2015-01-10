@@ -77,64 +77,64 @@
     NSLog(@"%li", (long)labelTouched.tag);
     NSString *labelTag = [NSString stringWithFormat:@"%li",(long)labelTouched.tag];
 
-    //multiplayer and singleplayer logic
-    if ((!([self.playerXMoves containsObject:labelTag]  ||
-        [self.playerOMoves containsObject:labelTag])) && labelTouched!=nil )
-    {
-        if (self.isMultiplayer)
-        {
-            if (self.isPlayerXTurn)
-            {
-                labelTouched.text = @"X";
-                labelTouched.textColor = [UIColor blueColor];
-                self.playerTurnLabel.text = @"O's turn";
-
-                [self.playerXMoves addObject:labelTag];
-
-                self.didPlayerWin = [self.winConditionChecker checkWinConditions:self.playerXMoves];
-            } else
-            {
-                labelTouched.text = @"O";
-                labelTouched.textColor = [UIColor redColor];
-                [self.playerOMoves addObject:labelTag];
-                self.playerTurnLabel.text = @"X's turn";
-                self.didPlayerWin = [self.winConditionChecker checkWinConditions:self.playerOMoves];
-            }
-            //add to set
-            //check set to subsets
-            [self hasGameEnded];
-
-            self.isPlayerXTurn = !self.isPlayerXTurn;
-
-        }
-        else //singleplayer
-        {
-                labelTouched.text = @"X";
-                labelTouched.textColor = [UIColor blueColor];
-                self.playerTurnLabel.text = @"O's turn";
-
-                [self.playerXMoves addObject:labelTag];
-
-                self.didPlayerWin = [self.winConditionChecker checkWinConditions:self.playerXMoves];
-
-            [self hasGameEnded];
-
-            self.isPlayerXTurn = !self.isPlayerXTurn;
-            if(!self.didPlayerWin && !self.didGameDraw)
-            {
-                [self CPUMoves];
-                [self hasGameEnded];
-            }
-            self.isPlayerXTurn = YES;
-            self.playerTurnLabel.text = @"X's turn";
-
-
-        }
-
-        self.remainingTicks = 31;
-        self.timeToPlay = [NSTimer scheduledTimerWithTimeInterval: 1.0 target: self selector: @selector(handleTimerTick) userInfo: nil repeats: NO];
-
-    }
+//    //multiplayer and singleplayer logic
+//    if ((!([self.playerXMoves containsObject:labelTag]  ||
+//        [self.playerOMoves containsObject:labelTag])) && labelTouched!=nil )
+//    {
+//        if (self.isMultiplayer)
+//        {
+//            if (self.isPlayerXTurn)
+//            {
+//                labelTouched.text = @"X";
+//                labelTouched.textColor = [UIColor blueColor];
+//                self.playerTurnLabel.text = @"O's turn";
+//
+//                [self.playerXMoves addObject:labelTag];
+//
+//                self.didPlayerWin = [self.winConditionChecker checkWinConditions:self.playerXMoves];
+//            } else
+//            {
+//                labelTouched.text = @"O";
+//                labelTouched.textColor = [UIColor redColor];
+//                [self.playerOMoves addObject:labelTag];
+//                self.playerTurnLabel.text = @"X's turn";
+//                self.didPlayerWin = [self.winConditionChecker checkWinConditions:self.playerOMoves];
+//            }
+//            //add to set
+//            //check set to subsets
+//            [self hasGameEnded];
+//
+//            self.isPlayerXTurn = !self.isPlayerXTurn;
+//
+//        }
+//        else //singleplayer
+//        {
+//                labelTouched.text = @"X";
+//                labelTouched.textColor = [UIColor blueColor];
+//                self.playerTurnLabel.text = @"O's turn";
+//
+//                [self.playerXMoves addObject:labelTag];
+//
+//                self.didPlayerWin = [self.winConditionChecker checkWinConditions:self.playerXMoves];
+//
+//            [self hasGameEnded];
+//
+//            self.isPlayerXTurn = !self.isPlayerXTurn;
+//            if(!self.didPlayerWin && !self.didGameDraw)
+//            {
+//                [self CPUMoves];
+//                [self hasGameEnded];
+//            }
+//            self.isPlayerXTurn = YES;
+//            self.playerTurnLabel.text = @"X's turn";
+//
+//
+//        }
+//
+//        self.remainingTicks = 31;
+//        self.timeToPlay = [NSTimer scheduledTimerWithTimeInterval: 1.0 target: self selector: @selector(handleTimerTick) userInfo: nil repeats: NO];
+//
+//    }
 
     //multiplayer multiple devices logic
     if (self.isMPCMultiplayer) {
