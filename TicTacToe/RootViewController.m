@@ -12,6 +12,7 @@
 
 @interface RootViewController ()
 @property BOOL isMultiplayer;
+@property BOOL isMultiplayerMPC;
 
 @end
 
@@ -19,7 +20,8 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view.
+    self.isMultiplayerMPC = NO;
+    self.isMultiplayer = NO;
 }
 - (IBAction)singlePlayerButtonTapped:(id)sender
 {
@@ -29,6 +31,9 @@
 {
     self.isMultiplayer = YES;
 }
+- (IBAction)multiplayerMPCbuttonTapped:(id)sender {
+    self.isMultiplayerMPC = YES;
+}
 
 -(void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
 {
@@ -36,8 +41,14 @@
 
 if ([[segue.destinationViewController restorationIdentifier] isEqualToString:@"GameViewController"])
     {
+        if(self.isMultiplayerMPC)
+        {
         GameViewController *vc = segue.destinationViewController;
         vc.isMultiplayer = self.isMultiplayer;
+            vc.isMPCMultiplayer = self.isMultiplayerMPC;
+        }
+    
+
     }
 }
 

@@ -11,7 +11,7 @@
 @interface GameViewController : UIViewController
 
 @property BOOL isMultiplayer;
-
+@property BOOL isMPCMultiplayer;
 
 @end
 

@@ -8,8 +8,10 @@
 
 #import "GameViewController.h"
 #import "WinConditionChecker.h"
+#import "AppDelegate.h"
 
 @interface GameViewController () <UIGestureRecognizerDelegate, UIAlertViewDelegate>
+@property (nonatomic,strong)  AppDelegate *appDelegate;
 @property (weak, nonatomic) IBOutlet UILabel *labelRow1Column1;
 @property (weak, nonatomic) IBOutlet UILabel *labelRow1Column2;
 @property (weak, nonatomic) IBOutlet UILabel *labelRow1Column3;
@@ -56,6 +58,14 @@
     [self createNewGame];
     self.timeToPlay = [NSTimer scheduledTimerWithTimeInterval: 1.0 target: self selector: @selector(handleTimerTick) userInfo: nil repeats: YES];
 
+    //MPC CODE BELOW
+    _appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(didReceiveDataWithNotification:)
+                                                 name:@"MCDidReceiveDataNotification"
+                                               object:nil];
+
 
     
 }
@@ -67,6 +77,7 @@
     NSLog(@"%li", (long)labelTouched.tag);
     NSString *labelTag = [NSString stringWithFormat:@"%li",(long)labelTouched.tag];
 
+    //multiplayer and singleplayer logic
     if ((!([self.playerXMoves containsObject:labelTag]  ||
         [self.playerOMoves containsObject:labelTag])) && labelTouched!=nil )
     {
@@ -122,6 +133,39 @@
 
         self.remainingTicks = 31;
         self.timeToPlay = [NSTimer scheduledTimerWithTimeInterval: 1.0 target: self selector: @selector(handleTimerTick) userInfo: nil repeats: NO];
+
+    }
+
+    //multiplayer multiple devices logic
+    if (self.isMPCMultiplayer) {
+        if ((!([self.playerXMoves containsObject:labelTag]  ||
+               [self.playerOMoves containsObject:labelTag])) && labelTouched!=nil ){
+            [self sendMessage:labelTag];
+            if (self.isPlayerXTurn)
+            {
+                labelTouched.text = @"X";
+                labelTouched.textColor = [UIColor blueColor];
+                self.playerTurnLabel.text = @"O's turn";
+
+                [self.playerXMoves addObject:labelTag];
+
+                self.didPlayerWin = [self.winConditionChecker checkWinConditions:self.playerXMoves];
+            } else
+            {
+                labelTouched.text = @"O";
+                labelTouched.textColor = [UIColor redColor];
+                [self.playerOMoves addObject:labelTag];
+                self.playerTurnLabel.text = @"X's turn";
+                self.didPlayerWin = [self.winConditionChecker checkWinConditions:self.playerOMoves];
+            }
+            //add to set
+            //check set to subsets
+            [self hasGameEnded];
+
+            self.isPlayerXTurn = !self.isPlayerXTurn;
+
+
+        }
 
     }
 
@@ -257,5 +301,37 @@
 
 }
 
+#pragma mark - Peer-to-Peer Connectivity
+
+-(void)sendMessage:(NSString *)rawDataString{
+    NSData *dataToSend = [rawDataString dataUsingEncoding:NSUTF8StringEncoding];
+    NSArray *allPeers = _appDelegate.mcManager.session.connectedPeers;
+    NSError *error;
+
+    [_appDelegate.mcManager.session sendData:dataToSend
+                                     toPeers:allPeers
+                                    withMode:MCSessionSendDataReliable
+                                       error:&error];
+
+    if (error) {
+        NSLog(@"%@", [error localizedDescription]);
+    }
+}
+
+-(void)didReceiveDataWithNotification:(NSNotification *)notification{
+    MCPeerID *peerID = [[notification userInfo] objectForKey:@"peerID"];
+//    NSString *peerDisplayName = peerID.displayName;
+
+    NSData *receivedData = [[notification userInfo] objectForKey:@"data"];
+    NSString *receivedText = [[NSString alloc] initWithData:receivedData encoding:NSUTF8StringEncoding];
+
+    UILabel *label = (UILabel *)[self.view viewWithTag:[receivedText intValue]];
+    if (self.isPlayerXTurn) {
+
+        label.text = @"x";
+    } else {
+        label.text = @"o";
+    }
+}
 
 @end
